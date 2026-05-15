@@ -617,6 +617,9 @@ static void decode_sequences_by_fse_and_execute (frame_context_t *p_ctx, istream
             ml = ML_BASELINES[ml_code] + backward_stream_readmove(&bst, ML_EXTRA_BITS[ml_code]);
             ll = LL_BASELINES[ll_code] + backward_stream_readmove(&bst, LL_EXTRA_BITS[ll_code]);
 
+            ERROR_CORRUPT_IF(ll > n_lit);
+            ERROR_O_SIZE_IF((ll + ml) > (size_t)(p_dst_limit - *pp_dst));
+
             memcpy(*pp_dst, p_lit, ll);
             (*pp_dst) += ll;
             p_lit += ll;
@@ -638,6 +641,7 @@ static void decode_sequences_by_fse_and_execute (frame_context_t *p_ctx, istream
         backward_stream_check_ended(&bst);
     }
 
+    ERROR_O_SIZE_IF(n_lit > (size_t)(p_dst_limit - *pp_dst));
     memcpy(*pp_dst, p_lit, n_lit);
     (*pp_dst) += n_lit;
 }
